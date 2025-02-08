@@ -1,0 +1,63 @@
+-- criar uma base de dados
+create database LojaDB
+ 
+-- usar base de dados
+use LojaDB
+ 
+-- criar uma tabela(Clientes)
+create table Clientes(
+ID int primary key identity(1,1),
+Nome varchar(100) not null,
+Email varchar(150) not null,
+DataCadastro date not null,
+)
+ 
+-- criar uma tabela(Produtos)
+create table Produtos(
+ID int primary key identity(1,1),
+NomeProduto varchar(100) not null,
+Preço float not null,
+)
+ 
+-- selecionar tabela Clientes
+select * from Clientes
+ 
+-- inserir dados na tabela Clientes
+insert into Clientes(Nome, Email, DataCadastro)
+values('Lucas', 'lucas.baraldi@gmail.com', '02-25-2013')
+
+insert into Clientes(Nome, Email, DataCadastro)
+values('Laura', 'lauranovaes@gmail.com', '09-27-2017')
+
+insert into Clientes(Nome, Email, DataCadastro)
+values('Nicolas', 'nicolaskk@gmail.com', '07-22-2018')
+ 
+ 
+-- selecionar tabela Produtos
+select * from Produtos
+ 
+-- inserir dados na tabela Produtos
+insert into Produtos(NomeProduto, Preço)
+values('Banana', '3.50')
+
+insert into Produtos(NomeProduto, Preço)
+values('Macarrao', '11.50')
+
+insert into Produtos(NomeProduto, Preço)
+values('Leite', '16.50')
+ 
+-- Atualizar o preço de um Produto
+update Produtos set Preço='12.50'
+where ID=2
+ 
+-- Atualizar o email de um Cliente
+update Clientes set Email='laurahhnovas@gmail.com'
+where ID=2
+ 
+-- deletar usuario de Clientes
+delete from Clientes
+where ID=3
+ 
+-- deletar preço de Produtos
+delete from Produtos
+where ID=3 
