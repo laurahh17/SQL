@@ -44,7 +44,7 @@ values('Macarrao', '11.50')
 insert into Produtos(NomeProduto, Preço)
 values('Leite', '16.50')
 
--- selecionar tabela Produtos
+-- ver tabela Produtos
 select * from Produtos
 
  
