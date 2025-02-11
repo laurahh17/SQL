@@ -18,10 +18,8 @@ ID int primary key identity(1,1),
 NomeProduto varchar(100) not null,
 Preço float not null,
 )
- 
--- selecionar tabela Clientes
-select * from Clientes
- 
+
+
 -- inserir dados na tabela Clientes
 insert into Clientes(Nome, Email, DataCadastro)
 values('Lucas', 'lucas.baraldi@gmail.com', '02-25-2013')
@@ -31,11 +29,11 @@ values('Laura', 'lauranovaes@gmail.com', '09-27-2017')
 
 insert into Clientes(Nome, Email, DataCadastro)
 values('Nicolas', 'nicolaskk@gmail.com', '07-22-2018')
- 
- 
--- selecionar tabela Produtos
-select * from Produtos
- 
+
+-- ver tabela Clientes
+select * from Clientes
+
+
 -- inserir dados na tabela Produtos
 insert into Produtos(NomeProduto, Preço)
 values('Banana', '3.50')
@@ -45,6 +43,10 @@ values('Macarrao', '11.50')
 
 insert into Produtos(NomeProduto, Preço)
 values('Leite', '16.50')
+
+-- selecionar tabela Produtos
+select * from Produtos
+
  
 -- Atualizar o preço de um Produto
 update Produtos set Preço='12.50'
