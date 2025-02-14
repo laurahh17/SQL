@@ -1,0 +1,29 @@
+create database MultasAplicadas
+ 
+use MultasAplicadas
+ 
+create table veiculos(
+  placa int primary key identity(1,1),
+  marca varchar(20) not null,
+  modelo varchar(25) not null,
+  cor varchar(10) not null
+)
+ 
+create table Multas(
+IdMultas int primary key identity(1,1),
+nomeMulta varchar(50) not null,
+valor float (30) not null,
+)
+ 
+create table Automação(
+placaVeiculo int primary key identity(1,1),
+IdMulta varchar(50) not null,
+DataMulta data not null,
+LocalDaMulta varchar(150) not null
+)
+ 
+select * from veiculos
+ 
+select * from Multas
+ 
+select * from Automação
