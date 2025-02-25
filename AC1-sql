@@ -1,0 +1,104 @@
+create database ComputadoresPersoa
+
+use ComputadoresPersoa
+
+create table Clientes(
+id_cliente int primary key identity(1,1),
+NomeClientes varchar(50),
+Email varchar(80),
+);
+
+create table Peças(
+  id_peça int primary key identity(1,1),
+  NomePeça varchar (60) not null,
+);
+
+create table Computador(
+id_computador int primary key identity(1,1),
+NomeComputador varchar(50) not null,
+Clientes int not null,
+Peças int not null,
+constraint fk_Computador_Clientes foreign key (Clientes)
+	references Clientes(id_cliente),
+	constraint fk_Computador_Pecas foreign key (Peças)
+	references Peças(id_peça) 
+);
+
+insert into Clientes(NomeClientes, Email)
+values('Nicolas Bueno', 'nicolas.bu@gmail.com')
+insert into Clientes(NomeClientes, Email)
+values('Laura Novaes', 'laura.novaes@gmail.com')
+insert into Clientes(NomeClientes, Email)
+values('Elizabeth Catharina', 'elizacath@gmail.com')
+insert into Clientes(NomeClientes, Email)
+values('Diego Oliveira', 'diegooli@gmail.com')
+insert into Clientes(NomeClientes, Email)
+values('João Pedro', 'joao.salvador@gmail.com')
+
+insert into Peças(NomePeça)
+values('Gabinete AKX')
+insert into Peças(NomePeça)
+values('Gabinete RGB')
+insert into Peças(NomePeça)
+values('Gabinete Hayom')
+insert into Peças(NomePeça)
+values('Processador Core i5')
+insert into Peças(NomePeça)
+values('Processador AMD Ryzen 7')
+insert into Peças(NomePeça)
+values('Processador Core i3')
+insert into Peças(NomePeça)
+values('Placa de video GTX')
+insert into Peças(NomePeça)
+values('Placa de video Radeon RX 6600')
+insert into Peças(NomePeça)
+values('Placa de video 3060')
+insert into Peças(NomePeça)
+values('Memória RAM 16GB')
+insert into Peças(NomePeça)
+values('Memória RAM 64GB')
+insert into Peças(NomePeça)
+values('Memória RAM 8GB')
+
+
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor Gamer', 2, 11)
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor Trabalho', 3, 10)
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor Laura', 2, 2)
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor do Diego', 4, 10)
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor Nicolas', 1, 4)
+insert into Computador(NomeComputador, Clientes, Peças)
+values('Compuatdor do João', 5, 7)
+
+select * from Computador
+
+-- todos os clientes e computadores
+select c.NomeComputador, c.Clientes, cl.NomeClientes, p.NomePeça
+from Computador c inner join Clientes cl on c.Clientes = cl.id_cliente
+inner join Peças p on c.Peças = p.id_peça;
+
+-- todos os computadores adquiridos por um cliente específico
+select c.NomeComputador
+from Computador c inner join Clientes cl on c.Clientes = cl.id_cliente
+where cl.NomeClientes = 'Laura Novaes';
+
+-- peça especific
+select c.NomeComputador
+from Computador c inner join Peças p on c.Peças = p.id_peça
+where p.NomePeça = 'Memória RAM 16GB';
+
+-- computador especifico
+select c.NomeComputador, p.NomePeça, cl.NomeClientes, cl.id_cliente
+from Computador c inner join Clientes cl on c.Clientes = cl.id_cliente
+inner join Peças p on c.Peças = p.id_peça
+where c.NomeComputador = 'Compuatdor Gamer';
+
+--peça especifica com os dados do cliente
+select c.NomeComputador
+from Computador c inner join Clientes cl on c.Clientes = cl.id_cliente
+inner join Peças p on c.Peças = p.id_peça
+where p.NomePeça = 'Memória RAM 16GB'; 
