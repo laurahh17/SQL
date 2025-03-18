@@ -3,17 +3,15 @@ create database aulaTrigger
 use aulaTrigger
 
 create table caixa(
-dataVenda date,
-saldo_inicial float,
-saldo_final float
+	id int primary key identity(1,1),
+	dataVenda date,
+	saldo_inicial float,
+	saldo_final float
 )
 
-insert into caixa
-values(getdate(),100,100)
-select * from caixa
 create table vendas(
+id int primary key identity(1,1),
 dataVenda date,
-codigo int,
 valor float
 )
 
@@ -29,6 +27,16 @@ begin
 	where dataVenda=@data
 end
 
+insert into caixa (dataVenda, saldo_inicial, saldo_final)
+values(getdate(),0,0)
+
+select * from caixa
+select * from vendas 
+
+insert into vendas(dataVenda, valor)
+values(getdate(),200)
+
+
 create trigger tgr_excluirVenda
 on vendas for delete
 as
@@ -41,11 +49,8 @@ begin
 	where dataVenda=@data
 end
 
-insert into vendas
-values (getdate(),2,50)
-
 delete from vendas
-where codigo=1
+where id=3
 
 select * from caixa
 select * from vendas
