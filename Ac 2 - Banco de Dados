@@ -156,15 +156,18 @@ begin
     --valores da nova multa inserida
     select
         @CarroID = CarroId,
-        @Pontos = Pontos
+        @Pontos = Pontos,
+		@MultaID = MultasId
     from inserted;
  
     --motorista com o carro
     select @motoristaID = MotoristaId
     from Prontuarios
-    where MultasId = MultaId;
+    where MultaId = @MultaID;
  
     --vincula multa ao prontuário no dia de hoje
+	if @MotoristaID is not null
+	begin
     insert into Prontuarios (MotoristaId, MultaId, DataAssociacao)
     values (@motoristaID, @MultaID, '2025-04-01');
  
@@ -172,6 +175,7 @@ begin
     update Motoristas
     set PontosCNH = PontosCNH + @Pontos
     where MotoristaId = @motoristaID;
+end;
 end;
 
 --
