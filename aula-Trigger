@@ -1,56 +1,217 @@
-create database aulaTrigger
-
-use aulaTrigger
-
-create table caixa(
-	id int primary key identity(1,1),
-	dataVenda date,
-	saldo_inicial float,
-	saldo_final float
-)
-
-create table vendas(
-id int primary key identity(1,1),
-dataVenda date,
-valor float
-)
-
-create trigger tgr_novaVenda
-on vendas for insert
+create database MultasDeCarros;
+ 
+use MultasDeCarros;
+ 
+create table Carros(
+    CarroId int primary key identity(1,1),
+    Placa char(7) not null,
+    Modelo varchar(40) not null,
+    Ano int not null
+);
+ 
+create table Motoristas(
+    MotoristaId int primary key identity(1,1),
+    Nome varchar(30) not null,
+    CNH char(9) not null,
+    PontosCNH int not null
+);
+ 
+create table Multas(
+    MultaId int primary key identity(1,1),
+    CarroId int not null,
+    DataMulta date not null,
+    Pontos int not null,
+    constraint fk_Multas_Carros foreign key (CarroId)
+        references Carros(CarroId)
+);
+ 
+create table Prontuarios(
+    ProntuarioId int primary key identity(1,1),
+    MotoristaId int not null,
+    MultaId int not null,
+    DataAssociacao date,
+    constraint fk_Prontuarios_Motorista foreign key (MotoristaId)
+        references Motoristas(MotoristaId),
+    constraint fk_Prontuarios_Multas foreign key (MultaId)
+        references Multas(MultaId)
+);
+ 
+--carros
+insert into Carros (Placa, Modelo, Ano)
+values ('ABC1234', 'Gol', 2020),
+       ('DEF5678', 'Civic', 2021),
+       ('GHI9012', 'Uno', 2019),
+       ('JKL3456', 'HB20', 2015),
+       ('MNO7890', 'Corolla', 2019);
+ 
+	   select * from Carros
+ 
+--motoristas
+insert into Motoristas (Nome, CNH, PontosCNH)
+values ('Pedro Marques', '123456789', 0),
+       ('Camila Souza', '987654321', 2),
+       ('Murilo Alves', '543216789', 1),
+       ('Patrik Silva', '567890123', 4),
+       ('Pamela Costa', '234567890', 2);
+ 
+	   select * from Motoristas
+ 
+--multas
+insert into Multas (CarroID, DataMulta, Pontos)
+values (1, '2023-11-26', 4),
+       (2, '2021-01-30', 7),
+       (3, '2025-10-18', 3),
+       (4, '2013-09-20', 5),
+       (5, '2022-12-17', 7);
+ 
+	   select * from Multas
+ 
+--multas ao motorista
+insert into Prontuarios (MotoristaID, MultaID, DataAssociacao)
+values (1, 3, '2023-11-26'),
+       (2, 1, '2021-01-30'),
+       (3, 5, '2025-10-18'),
+       (4, 4, '2014-06-10'),
+       (5, 2, '2022-12-17');
+ 
+	   select * from Prontuarios
+ 
+--
+create procedure AdicionarCarro
+    @Placa char(7),
+    @Modelo varchar(40),
+    @Ano int
 as
 begin
-	declare
-	@valor float,
-	@data datetime
-	select @data=dataVenda,@valor=valor from inserted
-	update caixa set saldo_final=saldo_final+@valor
-	where dataVenda=@data
-end
-
-insert into caixa (dataVenda, saldo_inicial, saldo_final)
-values(getdate(),0,0)
-
-select * from caixa
-select * from vendas 
-
-insert into vendas(dataVenda, valor)
-values(getdate(),200)
-
-
-create trigger tgr_excluirVenda
-on vendas for delete
+    insert into Carros(Placa, Modelo, Ano)
+    values (@Placa, @Modelo, @Ano);
+    select CarroId, Placa, Modelo, Ano from Carros
+    order by CarroId desc;
+end;
+ 
+exec AdicionarCarro 'XYZ0054', 'Civic', '2020';
+exec AdicionarCarro 'LOP9014', 'Chevrolet Onix', '2022';
+exec AdicionarCarro 'TYP1044', 'Kwid', '2019';
+ 
+ 
+--
+create procedure AdicionarMotorista
+    @Nome varchar(30),
+    @CNH char(9),
+    @PontosCNH int
 as
 begin
-	declare
-	@valor float,
-	@data datetime
-	select @data=dataVenda,@valor=valor from deleted
-	update caixa set saldo_final=saldo_final-@valor
-	where dataVenda=@data
-end
-
-delete from vendas
-where id=3
-
-select * from caixa
-select * from vendas
+    insert into Motoristas(Nome, CNH, PontosCNH)
+    values (@Nome, @CNH, @PontosCNH);
+    select Nome, CNH, PontosCNH from Motoristas
+    order by MotoristaId desc;
+end;
+ 
+exec AdicionarMotorista 'Laura Novaes', '112233445', 0;
+exec AdicionarMotorista 'Beatriz Nunes', '264839268', 2;
+exec AdicionarMotorista 'Lucas Baraldi', '362927661', 3;
+ 
+--
+create procedure AdicionarMulta
+    @CarroId int,
+    @DataMulta date,
+    @Pontos int
+as
+begin
+    insert into Multas(CarroId, DataMulta, Pontos)
+    values (@CarroId, @DataMulta, @Pontos);
+    select CarroId, DataMulta, Pontos from Multas
+    order by MultaId desc;
+end;
+ 
+exec AdicionarMulta 6, '2023-11-01', 3;
+exec AdicionarMulta 2, '2022-09-10', 4;
+exec AdicionarMulta 4, '2025-04-20', 3;
+ 
+--
+create procedure AdicionarProntuarios
+    @MotoristaId int,
+    @MultaId int,
+    @DataAssociacao date
+as
+begin
+    insert into Prontuarios(MotoristaId, MultaId, DataAssociacao)
+    values (@MotoristaId, @MultaId, @DataAssociacao);
+    select MotoristaId, MultaId, DataAssociacao from Prontuarios
+    order by ProntuarioId desc;
+end;
+ 
+exec AdicionarProntuarios 6, 6, '2023-11-01';
+exec AdicionarProntuarios 4, 4, '2023-05-27';
+exec AdicionarProntuarios 1, 1, '2025-02-19';
+ 
+--
+ 
+create trigger tgr_VincularMulta
+    on Multas for insert
+as
+begin
+    declare
+        @MotoristaID int,
+        @Pontos int,
+        @CarroID int;
+ 
+    --valores da nova multa inserida
+    select
+        @CarroID = CarroId,
+        @Pontos = Pontos
+    from inserted;
+ 
+    --motorista com o carro
+    select @motoristaID = MotoristaId
+    from Prontuarios
+    where MultaId = (select MultaId from Multas where CarroId = @CarroID);
+ 
+    --vincula multa ao prontuário no dia de hoje
+    insert into Prontuarios (MotoristaId, MultaId, DataAssociacao)
+    values (@motoristaID, (select MultaId from inserted), '2025-04-01');
+ 
+    --atualiza pontos da CNH
+    update Motoristas
+    set PontosCNH = PontosCNH + @Pontos
+    where MotoristaId = @motoristaID;
+end;
+ 
+--
+ 
+--motoristas e multas
+create procedure MotoristasEMultas
+as
+begin
+    select Motoristas.Nome, Multas.*
+    from Motoristas
+    join Prontuarios on Motoristas.MotoristaId = Prontuarios.MotoristaId
+    join Multas on Prontuarios.MultaId = Multas.MultaId;
+end;
+ 
+--motorista específico e suas multas
+create procedure MultasPorMotorista
+    @motoristaID int
+as
+begin
+    select Multas.*
+    from Multas
+    join Prontuarios on Multas.MultaId = Prontuarios.MultaId
+    where Prontuarios.MotoristaId = @motoristaID;
+end;
+ 
+--total de pontos na CNH de um motorista específico
+create procedure PontosCNHPorMotorista
+    @motoristaID int
+as
+begin
+    select MotoristaId, Nome, CNH, PontosCNH
+    from Motoristas
+    where MotoristaId = @motoristaID;
+end;
+ 
+exec MotoristasEMultas;
+ 
+exec MultasPorMotorista 1;
+ 
+exec PontosCNHPorMotorista 8;
