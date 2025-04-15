@@ -1,0 +1,73 @@
+create database ex_trigger
+
+use ex_trigger
+
+create table Produtos(
+	IdProduto int primary key identity,
+	NomeProduto varchar(100) not null,
+	Estoque int not null default 0,
+	Preco decimal (10,2) not null
+);
+
+create table Funcionarios(
+	IdFuncionarios int primary key identity,
+	NomeFuncionario varchar(100) not null
+);
+
+create table HistoricoEstoque(
+	IdHistorico int primary key identity,
+	IdProduto int not null,
+	DataAlteracao datetime not null default getdate(),
+	QuantidadeAnterior int,
+	QuantidadeNova int,
+	IdFuncionario int null, --Adicionada a coluna para o funcionário
+	foreign key (IdProduto) references Produtos(IdProduto),
+	foreign key (IdFuncionario) references Funcionarios(IdFuncionarios),
+);
+
+create trigger tr_AtualizarEstoque
+on Produtos
+after update 
+as
+begin
+	--Insere um registro na tabela HistoricoEstoque para cada linha atualizada
+	insert into HistoricoEstoque(IdProduto, QuantidadeAnterior, QuantidadeNova, IdFuncionario)
+	select
+		d.IdProduto,
+		d.Estoque, --Valor anterior do estoque (da tabela DELETED)
+		i.Estoque, -- Novo valor do estoque (da tabela INSERTED)	
+		null	  --o id do funcionario
+	from
+		deleted d
+		inner join
+		inserted i on d.IdProduto = i.IdProduto
+	where
+		d.Estoque<>i.Estoque; --Garante que apenas alterações reais sejam registradas
+end;
+
+-- Inserção de dados de exemplo na tabela Produtos
+	insert into Produtos (NomeProduto, Estoque, Preco) values
+	('Camiseta', 10, 25.99),
+	('Calça Jeans', 5, 79.50),
+	('Tênis', 8, 120.00);
+
+-- Inserção de dados de exemplo na tabela Funcionarios
+	insert into Funcionarios (NomeFuncionario) values
+	('Ana Silva'),
+	('Pedro Oliveira'),
+	('Carla Souza');
+
+
+-- Simulação de uma atualização no estoque (isso disparará a trigger)
+	update Produtos
+	set Estoque = 10
+	where IDProduto = 1;
+
+	update Produtos
+	set Estoque = 4
+	where IDProduto = 2;
+
+-- Consulta para verificar os dados nas tabelas
+	select * from Produtos;
+	select * from HistoricoEstoque;
+	select * from Funcionarios;
