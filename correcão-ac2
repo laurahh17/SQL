@@ -1,0 +1,93 @@
+create database multas
+
+use multas
+
+
+create table Carros (
+ CarroID int primary key identity (1,1),
+ Placa varchar(10),
+ Modelo varchar(50),
+ Ano int,
+ MotoristaID int,
+ foreign key (MotoristaID) references Motoristas(MotoristaID)
+);
+
+create table Motoristas (
+ MotoristaID int primary key identity (1,1),
+ Nome varchar(100),
+ CNH varchar(20),
+ PontosCNH int default 0
+);
+
+create table Multas (
+ MultaID int primary key identity (1,1),
+ CarroID int,
+ DataMulta date,
+ Pontos int,
+ foreign key (CarroID) references Carros(CarroID)
+);
+
+create table Prontuarios (
+ ProntuarioID int primary key identity (1,1),
+ MotoristaID int,
+ MultaID int,
+ DataAssociacao date,
+ foreign key (MotoristaID) references Motoristas(MotoristaID),
+ foreign key (MultaID) references Multas(MultaID)
+);
+
+create trigger inserirMulta
+on multas
+after insert
+as
+begin
+	declare @MultaID int;
+	declare @CarroID int;
+	declare @Pontos int;
+	declare @MotoristaID int;
+
+ select
+ @MultaID = MultaID,
+ @CarroID = CarroID,
+ @Pontos = Pontos
+ from inserted;
+
+ select @MotoristaID = Carros.MotoristaID
+ from Carros
+ where Carros.CarroID = @CarroID;
+
+ insert into Prontuarios (MotoristaID, MultaID, DataAssociacao)
+ values (@MotoristaID, @MultaID, getdate());
+
+ update Motoristas
+ set PontosCNH = PontosCNH + @Pontos
+ where Motoristas.MotoristaID = @MotoristaID;
+end;
+
+
+
+create procedure TodosMotoristasEMultas
+as begin
+ select Motoristas.Nome, Carros.Placa, Multas.DataMulta, Multas.Pontos
+ from Motoristas
+ join Carros on Motoristas.MotoristaID = Carros.MotoristaID
+ join Multas on Carros.CarroID = Multas.CarroID;
+end
+
+create procedure MotoristaESuasMultas
+@motorista_ID int
+as begin
+ select Motoristas.Nome, Carros.Placa, Multas.DataMulta, Multas.Pontos
+ from Motoristas
+ join Carros on Motoristas.MotoristaID = Carros.MotoristaID
+ join Multas on Carros.CarroID = Multas.CarroID
+ where Motoristas.MotoristaID = @motorista_id;
+end
+
+CREATE PROCEDURE TotalPontosCNH
+@motorista_id int
+as begin
+ select PontosCNH
+ from Motoristas
+ WHERE MotoristaID = @motorista_id;
+end
