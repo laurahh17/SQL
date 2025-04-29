@@ -1,0 +1,22 @@
+create database aulaTransacao
+ 
+use aulaTransacao
+
+create table Contas(
+IdConta int primary key,
+Saldo decimal(10, 2)
+);
+
+insert into Contas (IdConta, Saldo) values (1, 1000.00);
+insert into Contas (IdConta, Saldo) values (2, 500.00);
+
+begin transaction --sql esta em transação, e todos os comandos precisam ser confirmados
+
+update Contas set Saldo = Saldo - 100 where IdConta = 1;
+update Contas set Saldo = Saldo + 100 where IdConta = 2;
+
+rollback; -- umas das formas de finalizar uma transação (tudo que esta entre o begin e o rollback desz oq foi feito na tabela
+
+commit; -- outra forma de finalizar (tudo o que foi feito vai ser confirmado e nao podera reverter depois
+
+select * from Contas
