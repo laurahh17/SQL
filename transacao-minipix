@@ -1,0 +1,50 @@
+create database transacao
+
+use transacao
+
+--criando tabela de clientes
+create table Clientes(
+ClienteID int primary key,
+Nome varchar(100),
+Saldo decimal(10,2)
+);
+
+insert into Clientes (ClienteID, Nome, Saldo)
+values
+(1, 'Cliente A', 1000.00),
+(2, 'Cliente B', 500.00);
+
+--criando a stored procedure para transferencia de saldo
+create procedure TransferirSaldoEntreClientes
+ @ClienteOrigem int,
+ @ClienteDestino int,
+ @ValorTransferencia decimal(10,2)
+as
+begin
+  begin transaction TransferirSaldo;
+  --verificando se o saldo do cliente de origem é suficiente para a transferencia
+  if ((select Saldo from Clientes where ClienteID = @ClienteOrigem) >=
+  @ValorTransferencia)
+ begin
+	--atualizando saldo do cliente de orgiem
+  update Clientes
+  set Saldo = Saldo - @ValorTransferencia
+  where ClienteID = @ClienteOrigem;
+	--atualizar saldo do cliente de destino
+  update Clientes
+  set Saldo = Saldo + @ValorTransferencia
+  where ClienteID = @ClienteDestino;
+  commit transaction TransferirSaldo;
+  print 'Transferencia realizada com sucesso!';
+end --fim do bloco verdade do if
+	else
+	begin
+  rollback transaction TransferirSaldo;
+  print 'Saldo insuficiente para realizar a transferencia!';
+   end --fim do bloco falso do if
+end; --fim da procedure
+
+exec TransferirSaldoEntreClientes
+@ClienteOrigem = 2, @ClienteDestino = 1, @ValorTransferencia = 100.00
+
+select * from Clientes
