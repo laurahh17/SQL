@@ -1,0 +1,44 @@
+create database Exercicio
+ 
+use Exercicio
+ 
+create table Produtos (
+	ProdutoID int primary key,
+	Nome varchar(50),
+	Estoque decimal(10)
+);
+ 
+Insert into Produtos (ProdutoID, Nome, Estoque)
+values 
+(1, 'Maçarico', '10'),
+(2, 'Torneira', '2');
+ 
+select * from Produtos
+ 
+create procedure DiminuirEstoque
+@ProdutoOrigem int,
+@EstoqueAlterado decimal(10)
+as
+begin 
+begin transaction AlterarEstoque
+if ((select Estoque from Produtos where ProdutoID = @ProdutoOrigem) >= @EstoqueAlterado)
+ 
+begin
+update Produtos
+set Estoque = Estoque - @EstoqueAlterado
+where ProdutoID = @ProdutoOrigem;
+ 
+commit transaction AlterarEstoque;
+print 'Estoque alterado com sucesso';
+ 
+end
+else
+ 
+begin
+	rollback transaction AlterarEstoque;
+	print 'Estoque insucifiente';
+end -- End da transação
+end; -- End da procedure
+ 
+exec DiminuirEstoque
+@ProdutoOrigem = 1, @EstoqueAlterado = 5
