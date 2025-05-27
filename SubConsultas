@@ -1,0 +1,49 @@
+create database aulaSubConsulta
+
+use aulaSubConsulta
+
+create table clientes (
+ id_cliente int primary key,
+ nome varchar(100),
+ cidade varchar(100)
+);
+
+create table pedidos (
+ id_pedido int primary key,
+ id_cliente int,
+ valor decimal(10, 2),
+ data_pedido date,
+ foreign key (id_cliente) references clientes(id_cliente)
+);
+
+insert into clientes (id_cliente, nome, cidade) values
+(1, 'João', 'São Paulo'),
+(2, 'Maria', 'Rio de Janeiro'),
+(3, 'Pedro', 'Salvador');
+
+insert into pedidos (id_pedido, id_cliente, valor, data_pedido) values
+(1, 1, 100.00, '2025-05-01'),
+(2, 2, 150.00, '2025-05-02'),
+(3, 3, 200.00, '2025-05-03'),
+(4, 1, 50.00, '2025-05-04');
+
+select id_cliente, nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor > 100);
+
+-- in = pensando em formar uma lista
+-- ele lista oq vc pedir a ele( quantidade de pedidos, soma, listar todos)
+
+select nome from clientes c
+where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.valor > 100
+); --select 1 ele vai apenas selecionar os primeiros(maria tem duas compras no valor maior que 100, mas vai apenas mostrar uma vez
+
+-- exists tem como objetivo apenas verificar(com ele nao tem como saber quantas contas ele tem com um valor maior que 100 reais, ele apenas verifica se tem alguma)
+
+select nome, (select max(valor)
+			  from pedidos 
+			  where id_cliente = c.id_cliente) --atriburo nome e outro atributo entre () 
+ as maior_pedido from clientes c;
+
+-- A subconsulta retorna o maior valor de pedido feito por cada cliente.
+-- A função max() retorna o maior valor encontrado por cliente.
+-- Resultado: nome do cliente e o valor do seu pedido mais caro.
