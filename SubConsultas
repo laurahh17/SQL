@@ -42,7 +42,7 @@ where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.v
 select nome, (select max(valor)
 			  from pedidos 
 			  where id_cliente = c.id_cliente) --atriburo nome e outro atributo entre () 
- as maior_pedido from clientes c;
+ as 'Maior valor de pedidos' from clientes c;
 
 -- A subconsulta retorna o maior valor de pedido feito por cada cliente.
 -- A função max() retorna o maior valor encontrado por cliente.
