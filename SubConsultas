@@ -44,6 +44,7 @@ select nome, (select max(valor)
 			  where id_cliente = c.id_cliente) --atriburo nome e outro atributo entre () 
  as 'Maior valor de pedidos' from clientes c;
 
+-- as apenas muda o nome da coluna
 -- A subconsulta retorna o maior valor de pedido feito por cada cliente.
 -- A função max() retorna o maior valor encontrado por cliente.
 -- Resultado: nome do cliente e o valor do seu pedido mais caro.
