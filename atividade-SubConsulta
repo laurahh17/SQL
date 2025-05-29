@@ -1,0 +1,64 @@
+create database aulaSubConsulta
+
+use aulaSubConsulta
+
+create table clientes (
+ id_cliente int primary key,
+ nome varchar(100),
+ cidade varchar(100)
+);
+
+create table pedidos (
+ id_pedido int primary key,
+ id_cliente int,
+ valor decimal(10, 2),
+ data_pedido date,
+ foreign key (id_cliente) references clientes(id_cliente)
+);
+
+insert into clientes (id_cliente, nome, cidade) values
+(1, 'João', 'São Paulo'),
+(2, 'Maria', 'Rio de Janeiro'),
+(3, 'Pedro', 'Salvador');
+
+insert into pedidos (id_pedido, id_cliente, valor, data_pedido) values
+(1, 1, 100.00, '2025-05-01'),
+(2, 2, 150.00, '2025-05-02'),
+(3, 3, 200.00, '2025-05-03'),
+(4, 1, 50.00, '2025-05-04');
+
+select id_cliente, nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor > 100); -- 1
+
+select id_cliente, nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor > 50); -- 2
+
+select id_cliente, nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor =0); -- 3
+
+select nome, (select max(valor)
+			  from pedidos 
+			  where id_cliente = c.id_cliente) 
+ as 'Maior valor de pedidos' from clientes c; -- 4
+
+ select nome, (select sum(valor)
+				from pedidos
+				where id_cliente = c.id_cliente)
+ as 'Soma dos pedidos' from clientes c; -- 5
+
+
+select cidade from clientes c
+where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.valor >= 50 
+); -- 6
+
+select count(nome)
+from clientes; -- 7 nao entendi
+
+select id_cliente, nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor = 50); -- 8 
+
+select cidade from clientes c
+where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.valor > 150 ); -- 9
+
+-- 10
+
