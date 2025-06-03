@@ -1,25 +1,31 @@
-create database aulaSubConsulta
+create database SubConsulta
+go
 
-use aulaSubConsulta
+use SubConsulta
+go
 
-create table clientes (
- id_cliente int primary key,
- nome varchar(100),
- cidade varchar(100)
+create table clientes(
+id_cliente int primary key,
+nome varchar(100),
+cidade varchar(100)
 );
 
-create table pedidos (
- id_pedido int primary key,
- id_cliente int,
- valor decimal(10, 2),
- data_pedido date,
- foreign key (id_cliente) references clientes(id_cliente)
+create table pedidos(
+id_pedido int primary key,
+id_cliente int,
+valor decimal(10, 2),
+data_pedido date
+foreign key (id_cliente) references clientes (id_cliente)
 );
+go
 
 insert into clientes (id_cliente, nome, cidade) values
+(4, 'Laura', 'Amazonas'),
 (1, 'João', 'São Paulo'),
 (2, 'Maria', 'Rio de Janeiro'),
 (3, 'Pedro', 'Salvador');
+
+select * from clientes
 
 insert into pedidos (id_pedido, id_cliente, valor, data_pedido) values
 (1, 1, 100.00, '2025-05-01'),
@@ -27,14 +33,17 @@ insert into pedidos (id_pedido, id_cliente, valor, data_pedido) values
 (3, 3, 200.00, '2025-05-03'),
 (4, 1, 50.00, '2025-05-04');
 
-select id_cliente, nome from clientes
-where id_cliente in ( select id_cliente from pedidos where valor > 100); -- 1
+--1 cliente com pelo menos um pedido > 100
+select nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor > 100);
 
-select id_cliente, nome from clientes
-where id_cliente in ( select id_cliente from pedidos where valor > 50); -- 2
+select nome from clientes
+where id_cliente in ( select id_cliente from pedidos where valor > (select avg(valor)from pedidos -- 2 (avg calcula a media)
+	)
+);
 
-select id_cliente, nome from clientes
-where id_cliente in ( select id_cliente from pedidos where valor =0); -- 3
+select nome from clientes
+where id_cliente not in ( select id_cliente from pedidos); -- 3 (not in ele pega todos os id que estao la mas ele filtra para mostrar oq nao consta)
 
 select nome, (select max(valor)
 			  from pedidos 
@@ -47,18 +56,22 @@ select nome, (select max(valor)
  as 'Soma dos pedidos' from clientes c; -- 5
 
 
-select cidade from clientes c
-where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.valor >= 50 
+select distinct cidade from clientes c -- distinct nao copia todos os nomes da cidade(se tem 3 São Paulo, ele vai mostrar a primeira
+where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente
 ); -- 6
 
-select count(nome)
-from clientes; -- 7 nao entendi
+select nome from clientes
+where( select count(*)
+from pedidos where pedidos.id_cliente = clientes.id_cliente) >1; -- 7 
 
 select id_cliente, nome from clientes
-where id_cliente in ( select id_cliente from pedidos where valor = 50); -- 8 
+where id_cliente in ( select id_cliente from pedidos where valor = (select avg(valor) from pedidos)
+); -- 8 
 
 select cidade from clientes c
 where exists ( select 1 from pedidos p where p.id_cliente = c.id_cliente and p.valor > 150 ); -- 9
 
--- 10
-
+select nome,
+(select top 1 valor from pedidos p 
+where p.id_cliente = c.id_cliente
+order by data_pedido desc) as 'Pedido mais recente' from clientes c; -- 10
